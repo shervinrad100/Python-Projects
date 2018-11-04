@@ -6,7 +6,7 @@ google = http.request('GET','https://google.com/trends/')
 
 search_term = str(input('enter search term or a topic: '))
 
-driver = webdriver.Chrome('C:/Users/sherv/OneDrive/Documents/GitHub/Projects')
+driver = webdriver.Chrome('C:/Users/sherv/OneDrive/Documents/GitHub/Projects/Research Project/chromedriver.exe')
 search_box = driver.find_element_by_id('input-1')
 search_box.send_keys(search_term)
 '''
@@ -18,7 +18,7 @@ mypassword = 'Xmas2015'
 #input('enter password: ')
 myemail = 'shervinrad100@gmail.com'
 # pool the web
-driver = webdriver.Chrome('C:/Users/sherv/OneDrive/Documents/GitHub/Projects/chromedriver.exe')
+driver = webdriver.Chrome('C:/Users/sherv/OneDrive/Documents/GitHub/Projects/Research Project/chromedriver.exe')
 driver.set_page_load_timeout(30) # in sec
 driver.get('https://www.facebook.com/')
 # find username and password fields
