@@ -41,11 +41,11 @@ def MA(series, n): # https://www.youtube.com/watch?v=5-SV_xXQ_wE
     weights = np.repeat(1.0, n)/n
     MA = np.convolve(series,weights,'valid')
     return MA
-
-RDPI_MA = MA(RDPI,12)
+n =12
+RDPI_MA = MA(RDPI,n)
 
 plt.figure()
 plt.plot(dates,amazon)
 plt.figure()
 plt.plot(dates,RDPI)
-plt.plot(dates[:-11],RDPI_MA)
+plt.plot(dates,RDPI_MA)
