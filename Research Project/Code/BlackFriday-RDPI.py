@@ -1,4 +1,4 @@
-#import numpy as np
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator
@@ -19,7 +19,7 @@ DSPIC['MA_12'] = DSPIC["DSPIC96"].rolling(12).mean()
 
 # Visualise:
 # Google trends: amazon: (United States)
-plt.figure(1)
+plt.figure()
 minor_locator = AutoMinorLocator(12)
 Google_amazon_US["amazon: (United States)"].plot(figsize=(12,4)).xaxis.set_minor_locator(minor_locator)
 plt.xlabel("Year")
@@ -28,7 +28,7 @@ plt.grid()
 plt.legend()
 
 # Real Disposable Personal Incom
-plt.figure(2)
+plt.figure()
 DSPIC[["DSPIC96","MA_12"]].plot(figsize=(12,4)).xaxis.set_minor_locator(minor_locator)
 plt.xlabel("Year")
 plt.ylabel("$")
@@ -38,3 +38,11 @@ plt.legend()
 # Calculate error
 DSPIC['P-P_MA'] = DSPIC["DSPIC96"]-DSPIC["MA_12"]
 #DSPIC['P-P_AR'] = DSPIC["DSPIC96"]-DSPIC["AR_12"]
+
+plt.figure()
+DSPIC["P-P_MA"].plot()
+mu = np.ones(len(DSPIC))*DSPIC["P-P_MA"].mean()
+plt.plot(DSPIC["DATE"],mu)
+plt.grid()
+plt.legend()
+
