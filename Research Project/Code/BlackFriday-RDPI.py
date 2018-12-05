@@ -6,12 +6,12 @@ from matplotlib.ticker import AutoMinorLocator
 # Import data
 #PATH = r"C:\Users\sherv\OneDrive\Documents\GitHub\Python - Projects\Research Project\Data"
 Google_amazon_US = pd.read_csv("Amazon-2004-1_Present-mon-US(Grab-30-11-18).csv", index_col="Month", parse_dates=["Month"])
-DSPIC = pd.read_csv("RealDisposableIncome-2004-1_Present-Mon-US(Grab-30-11-18).csv", index_col="DATE", parse_dates=["DATE"])
-# time = pd.to_datetime(DSPIC["DATE"], infer_datetime=True)
-
-
+DSPIC = pd.read_csv("RealDisposableIncome-2004-1_Present-Mon-US(Grab-30-11-18).csv", parse_dates=["DATE"])
 # Adjust datasets
 Google_amazon_US = Google_amazon_US[:-2]
+
+
+
 # Create Moving Average model
 DSPIC['MA_12'] = DSPIC["DSPIC96"].rolling(12).mean()
 # Create Autoregressive model
@@ -36,13 +36,32 @@ plt.grid()
 plt.legend()
 
 # Calculate error
-DSPIC['P-P_MA'] = DSPIC["DSPIC96"]-DSPIC["MA_12"]
-#DSPIC['P-P_AR'] = DSPIC["DSPIC96"]-DSPIC["AR_12"]
+DSPIC['e_MA'] = DSPIC["DSPIC96"]-DSPIC["MA_12"]
+#DSPIC['e_AR'] = DSPIC["DSPIC96"]-DSPIC["AR_12"]
+
+
+# Check for stationarity
+plt.figure()
+DSPIC['e_MA'].hist()
+plt.grid()
+plt.title("Error point Histogram")
+#DSPIC['e_mu'] = DSPIC['e_MA'].mean()*np.ones(len(DSPIC))
+split = len(DSPIC)/2
+half1, half2 = DSPIC.loc[:split] , DSPIC.loc[split:]
+mu1, mu2 = half1.loc["e_MA"].mean(), half2.loc["e_MA"].mean()
+
+
 
 plt.figure()
-DSPIC["P-P_MA"].plot()
-mu = np.ones(len(DSPIC))*DSPIC["P-P_MA"].mean()
-plt.plot(DSPIC["DATE"],mu)
+DSPIC["e_MA"].plot()
+DSPIC["<e_MA>"] = np.ones(len(DSPIC))*DSPIC["e_MA"].mean()
+DSPIC["<e_MA>"].plot().xaxis.set_minor_locator(minor_locator)
+plt.ylim([-550,550])
+plt.xlabel("Year")
 plt.grid()
 plt.legend()
+plt.text(0.1, -500, r'$\mu =121.06$')
+
+DSPIC["(e_MA)-<e_MA>"]=DSPIC["e_MA"]-DSPIC["<e_MA>"]
+DSPIC["(e_MA)-<e_MA>"].mean()
 
