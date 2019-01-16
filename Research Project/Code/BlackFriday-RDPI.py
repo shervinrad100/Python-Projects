@@ -40,7 +40,7 @@ DSPIC['e_MA'] = DSPIC["DSPIC96"]-DSPIC["MA_12"]
 #DSPIC['e_AR'] = DSPIC["DSPIC96"]-DSPIC["AR_12"]
 
 
-# Check for stationarity
+# Check for stationarity in errors
 plt.figure()
 DSPIC['e_MA'].hist()
 plt.grid()
@@ -48,7 +48,7 @@ plt.title("Error point Histogram")
 #DSPIC['e_mu'] = DSPIC['e_MA'].mean()*np.ones(len(DSPIC))
 split = len(DSPIC)/2
 half1, half2 = DSPIC.iloc[:split] , DSPIC.iloc[split:]
-mu1, mu2 = half1.loc["e_MA"].mean(), half2.loc["e_MA"].mean()
+mu1, mu2 = half1.loc["e_MA"].mean(), half2.loc["e_MA"].mean() # gettign errors here
 
 
 
