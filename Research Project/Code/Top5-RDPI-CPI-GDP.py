@@ -4,7 +4,7 @@ from matplotlib.ticker import AutoMinorLocator # for time series visualisation
 
 # Import data
 #PATH = r"C:\Users\sherv\OneDrive\Documents\GitHub\Python - Projects\Research Project\Data"
-google = pd.read_csv("Top5-aggregate.csv", index_col="Month", parse_dates=["Month"])
+google = pd.read_csv("multiTimeline.csv", index_col="Month", parse_dates=["Month"])
 RDPI = pd.read_csv("RealDisposableIncome-2004-1_Present-Mon-US(Grab-30-11-18).csv", index_col="DATE" ,parse_dates=["DATE"])
 CPI = pd.read_csv("CPI.csv", index_col="DATE" , parse_dates=["DATE"])
 GDP = pd.read_csv("GDP.csv", index_col="DATE" , parse_dates=["DATE"])
@@ -49,47 +49,6 @@ CPI['e(MA_2)'] = CPI["CPI"] - CPI['MA_2']
 # Visualise
 minor_locator = AutoMinorLocator(12)
 
-# Investigating overall trendSS
-    # Google-CPI
-fig, ax1 = plt.subplots()
-google["Top5"].plot(ax=ax1,color='b').xaxis.set_minor_locator(minor_locator)
-ax1.set_xlabel('Date')
-ax1.set_ylabel('google (%)', color='b')
-ax1.tick_params('y', colors='b')
-plt.grid()
-ax2 = ax1.twinx()
-CPI["CPI"].plot(ax=ax2,color='r')
-ax2.set_ylabel('CPI 1982-1985=100 (%)', color='r')
-ax2.tick_params('y', colors='r')
-plt.title("Google vs CPI trends")
-
-    # Google-RDPI
-fig, ax1 = plt.subplots()
-google["Top5"].plot(ax=ax1,color='b').xaxis.set_minor_locator(minor_locator)
-ax1.set_xlabel('Date')
-ax1.set_ylabel('google (%)', color='b')
-ax1.tick_params('y', colors='b')
-plt.grid()
-ax2 = ax1.twinx()
-RDPI["DSPIC96"].plot(ax=ax2,color='r')
-ax2.set_ylabel('RDPI ($)', color='r')
-ax2.tick_params('y', colors='r')
-plt.title("Google vs RDPI trends")
-
-    # Google-GDP
-fig, ax1 = plt.subplots()
-google["Top5"].plot(ax=ax1,color='b').xaxis.set_minor_locator(minor_locator)
-ax1.set_xlabel('Date')
-ax1.set_ylabel('google (%)', color='b')
-ax1.tick_params('y', colors='b')
-plt.grid()
-ax2 = ax1.twinx()
-GDP["GDP"].plot(ax=ax2,color='r')
-ax2.set_ylabel('GDP (B$)', color='r')
-ax2.tick_params('y', colors='r')
-plt.title("Google vs GDP trends")
-
-'''
 # google
 plt.figure()
 google["Top5"].plot(figsize=(12,4)).xaxis.set_minor_locator(minor_locator)
@@ -158,4 +117,3 @@ CPI['e(MA_2)'].plot()
 plt.grid()
 plt.legend()
 plt.title("CPI Moving average rolling 2 error")
-'''
