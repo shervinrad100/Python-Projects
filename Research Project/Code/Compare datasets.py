@@ -1,6 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator # for time series visualisation
+from statsmodels.tsa.stattools import adfuller
+
 
 
 # Import data
@@ -35,7 +37,6 @@ PMI = pd.read_csv("ISM-MAN_PMI.csv", index_col="Date", parse_dates=["Date"])
 DJI = pd.read_csv("DJI.csv", index_col="Date", parse_dates=["Date"])
 
 # Check for unit root ADF test
-from statsmodels.tsa.stattools import adfuller
 def rootTest(dataset):
     result = adfuller(dataset)
     print('ADF Statistic: %f' % result[0])
@@ -43,6 +44,8 @@ def rootTest(dataset):
     print('Critical Values:')
     for key, value in result[4].items():
     	print('\t%s: %.3f' % (key, value))
+
+
 # implement for loop?
 print("goolge:")
 rootTest(google["Top5"])
