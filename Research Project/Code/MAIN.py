@@ -2,7 +2,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator # for time series visualisation
 from statsmodels.tsa.stattools import adfuller
-from statsmodels.graphics.tsaplots import plot_acf
+#from statsmodels.graphics.tsaplots import plot_acf
+from pandas.plotting import autocorrelation_plot
+
 
 # Functions 
 def importdata(key, path ,parseCol):
@@ -14,7 +16,7 @@ def importdata(key, path ,parseCol):
 def UnitRootTest(array):
     ''' check for unit root errors in dataset'''
     result = adfuller(array)
-    print('ADF Statistic: %f' % result[0])
+    print('ADF t-Statistic: %f' % result[0])
     print('p-value: %f' % result[1])
     print('Critical Values:')
     for key, value in result[4].items():
@@ -55,6 +57,12 @@ def plot_residuals(key, Title):
     plt.grid()
     plt.legend()
     plt.title(Title)
+    
+def plot_ACF(key, Title):
+    plt.figure()
+    autocorrelation_plot(data[key][meta[key][2]])
+    plt.title(Title)
+
 
 # Data
 #PATH = r"C:\Users\sherv\OneDrive\Documents\GitHub\Python - Projects\Research Project\Data"    
@@ -67,7 +75,8 @@ meta = {# dataset: [path, Date_col, Value_col]
         "SP500": ["S&P500.csv", "Date", "Close"], 
         "IR":    ["InterestRate_2004-1-1_Present_US(Grab-5-12-18).csv", "DATE", "FEDFUNDS"], 
         "PPI":   ["PPIACO.csv", "DATE", "PPI"],
-        "PMI":   ["ISM-MAN_PMI.csv", "Date", "PMI"]} # issue with PMI date format
+        "PMI":   ["ISM-MAN_PMI.csv", "Date", "PMI"],
+        "DJI":   ["DJI.csv", "Date", "Close"]} 
 
 data ={}
 
@@ -78,12 +87,14 @@ for key in meta.keys():
 # Import data
     data[key] = importdata(key, meta[key][0], meta[key][1])
     
+# Calculate Returns
+    data[key]["R"] = data[key][meta[key][2]].shift(1) / data[key][meta[key][2]] -1
+    
 # Check for unit root ADF test
     print("%s: " %(key))
     UnitRootTest(data[key][meta[key][2]])
-
-# Calculate Returns
-    data[key]["R"] = data[key][meta[key][2]].shift(1) / data[key][meta[key][2]] -1
+    print("%s First difference (R):" %(key))
+    UnitRootTest(data[key]["R"][1:])
 
     
 # Moving averages
@@ -105,13 +116,13 @@ for key in meta.keys():
     
 # Visualise
     # Overal trends
-    Compare(data["google"][meta["google"][2]], "Google Trends (%)", data[key][meta[key][2]], "%s" %(key), "Google Trends v %s" %(meta[key][2]))
+#    Compare(data["google"][meta["google"][2]], "Google Trends (%)", data[key][meta[key][2]], "%s" %(key), "Google Trends v %s" %(meta[key][2]))
     # Index and regressor
-    plot_regressors(key, meta[key][2], key)
+#    plot_regressors(key, meta[key][2], key)
     # Autocorrelation
-    plot_acf(data[key][meta[key][2]], title="%s ACF" %(key))
+#    plot_ACF(key, "%s ACF" %(key))
     # residual plots
-    plot_residuals(key, "%s residuals" %(key))
+#    plot_residuals(key, "%s residuals" %(key))
     
 
 
