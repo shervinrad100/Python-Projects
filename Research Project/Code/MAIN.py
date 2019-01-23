@@ -66,7 +66,7 @@ def plot_regressors(key, lag, Title, central="true"):
     plt.savefig("%s\%s.png" %(PATH, Title))
     
     
-def plot_residuals(key, lag, Title, central="both"):
+def plot_residuals(key, lag, Title, central="both", stats=True):
     std={}
     mu ={}
     for i in lag:
@@ -85,12 +85,6 @@ def plot_residuals(key, lag, Title, central="both"):
     if central == "both":
         for i in lag:
             data[key][["e(%s)" %(i), "ec(%s)" %(i)]].plot(ax = axes).xaxis.set_minor_locator(minor_locator)
-            yax = data[key][["e(%s)" %(i), "ec(%s)" %(i)]].max() 
-            scale = yax //6
-            plt.text("2019-02-01",yax - scale,r"$\sigma_{c}^2=$ "+std["ec%s" %(i)])
-            plt.text("2019-02-01",yax - 2*scale,r"$\mu_{c}^2=$ "+mu["ec%s" %(i)])
-            plt.text("2019-02-01",yax - 3*scale,r"$\sigma^2=$ "+std["e%s" %(i)])
-            plt.text("2019-02-01",yax - 4*scale,r"$\mu^2=$ "+mu["e%s" %(i)])
     elif central == "false":
         for i in lag:
             data[key][["e(%s)" %(i)]].plot(ax = axes).xaxis.set_minor_locator(minor_locator)
@@ -102,6 +96,10 @@ def plot_residuals(key, lag, Title, central="both"):
     plt.legend()
     plt.title(Title)
     plt.savefig("%s\%s.png" %(PATH, Title))
+    if stats == True:
+        print(Title)
+        print("std:", std)
+        print("mu:", mu)
     
 def plot_ACF(key, array, Title):
     plt.figure()
@@ -116,7 +114,7 @@ def distribution(key, array, Title):
         plt.title(Title)
         plt.savefig("%s\%s.png" %(PATH, Title))
     
-def IID_test(key, array):
+def Normal_test(key, array):
     Data = data[key][array].dropna()
     alpha = 0.05
     stat, p = shapiro(Data)
@@ -138,13 +136,13 @@ PATH = r"C:\Users\sherv\OneDrive\Documents\GitHub\Python - Projects\Research Pro
 meta = {# dataset: [path, Date_col, Value_col]
         "google":["multiTimeline.csv", "Month", "Top5"], 
         "RDPI":  ["RealDisposableIncome-2004-1_Present-Mon-US(Grab-30-11-18).csv", "DATE", "DSPIC96"], 
-        "CPI":   ["CPI.csv", "DATE", "CPI"],
-        "GDP":   ["GDP.csv", "DATE", "GDP"], 
-        "UE":    ["Unemployment_2004_Present_US(Grab-5-12-18).csv", "DATE", "Value"], 
+#        "CPI":   ["CPI.csv", "DATE", "CPI"],
+#        "GDP":   ["GDP.csv", "DATE", "GDP"], 
+#        "UE":    ["Unemployment_2004_Present_US(Grab-5-12-18).csv", "DATE", "Value"], 
         "SP500": ["S&P500.csv", "Date", "Close"], 
-        "IR":    ["InterestRate_2004-1-1_Present_US(Grab-5-12-18).csv", "DATE", "FEDFUNDS"], 
-        "PPI":   ["PPIACO.csv", "DATE", "PPI"],
-        "PMI":   ["ISM-MAN_PMI.csv", "Date", "PMI"],
+#        "IR":    ["InterestRate_2004-1-1_Present_US(Grab-5-12-18).csv", "DATE", "FEDFUNDS"], 
+#        "PPI":   ["PPIACO.csv", "DATE", "PPI"],
+#        "PMI":   ["ISM-MAN_PMI.csv", "Date", "PMI"],
         "DJI":   ["DJI.csv", "Date", "Close"]} 
 
 data ={}
@@ -195,15 +193,15 @@ for key in meta.keys():
     plot_ACF(key, "ec(3)", "ec(3) residual ACF- %s" %(key))
     plot_ACF(key, "R", "Return ACF- %s" %(key))
     # residual plots
-#    plot_residuals(key, [3],  "%s residuals e(3), ec(3)" %(key), central="both")
-#    plot_residuals(key, [12,3],  "%s residuals (central window) ec(3),ec(12)" %(key), central="true")
+    plot_residuals(key, [3],  "%s residuals e(3), ec(3)" %(key), central="both")
+    plot_residuals(key, [12,3],  "%s residuals (central window) ec(3),ec(12)" %(key), central="true")
     distribution(key, ["ec(3)"], "ec(%i) Residual distribution: %s" %(3,key))
     distribution(key, ["R"], "Returns destribution: %s" %(key))
     # normality test
     print(key)
     print("\t ec(3) skew %.3f" %(data[key]["ec(3)"].skew()))
     print("\t ec(3) kurtosis %.3f" %(data[key]["ec(3)"].kurtosis()))
-    IID_test(key, "ec(3)")
-    IID_test(key, "R")
+    Normal_test(key, "ec(3)")
+    Normal_test(key, "R")
 
 
