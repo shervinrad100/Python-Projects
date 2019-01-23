@@ -4,6 +4,8 @@ from matplotlib.ticker import AutoMinorLocator # for time series visualisation
 from statsmodels.tsa.stattools import adfuller
 #from statsmodels.graphics.tsaplots import plot_acf
 from pandas.plotting import autocorrelation_plot
+from scipy.stats import shapiro # shapiro wilk test for normality sample size thousands or fewer
+from scipy.stats import probplot
 
 
 # Functions 
@@ -43,7 +45,7 @@ def Compare(df_1, yName1, df_2, yName2, title):
 
 def plot_regressors(key, yName, Title):
     plt.figure()
-    data[key][[meta[key][2], "MA_12", "MA_6", "MA_2"]].plot().xaxis.set_minor_locator(minor_locator)
+    data[key][[meta[key][2], "MA_12", "MA_6", "MA_3"]].plot().xaxis.set_minor_locator(minor_locator)
     plt.xlabel("Year")
     plt.ylabel(yName)
     plt.grid()
@@ -58,10 +60,28 @@ def plot_residuals(key, Title):
     plt.legend()
     plt.title(Title)
     
-def plot_ACF(key, Title):
+def plot_ACF(key, array, Title):
     plt.figure()
-    autocorrelation_plot(data[key][meta[key][2]])
+    autocorrelation_plot(data[key][array].dropna())
     plt.title(Title)
+
+def distribution(key, arrayName, Title):
+    plt.figure()
+    data[key][arrayName].hist()   
+    plt.title(Title)
+    
+def IID_test(key, array):
+    Data = data[key][array].dropna()
+    alpha = 0.05
+    stat, p = shapiro(Data)
+    plt.figure()
+    probplot(data[key][array].dropna(), plot=plt, rvalue=True)
+    plt.title(key+" "+array)
+    print(key, "'%s'" %(array), '\n \t Test Statistics=%.3f, p=%.3f' % (stat, p))
+    if p >= alpha:
+        print(" \t %s Normally distributed" %(key+" "+"'%s'" %(array)))
+    else:
+        print(" \t %s Not normally distributed" %(key+" "+"'%s'" %(array)))
 
 
 # Data
@@ -90,39 +110,50 @@ for key in meta.keys():
 # Calculate Returns
     data[key]["R"] = data[key][meta[key][2]].shift(1) / data[key][meta[key][2]] -1
     
+'''
 # Check for unit root ADF test
     print("%s: " %(key))
     UnitRootTest(data[key][meta[key][2]])
     print("%s First difference (R):" %(key))
     UnitRootTest(data[key]["R"][1:])
+'''
 
-    
+for key in meta.keys():
 # Moving averages
     data[key]["MA_12"] = MA_forward(data[key][meta[key][2]], 12)
     data[key]["MA_6"] = MA_forward(data[key][meta[key][2]], 6)
-    data[key]["MA_2"] = MA_forward(data[key][meta[key][2]], 2)
+    data[key]["MA_3"] = MA_forward(data[key][meta[key][2]], 3)
     data[key]["MAc_12"] = MA_central(data[key][meta[key][2]], 12)
     data[key]["MAc_6"] = MA_central(data[key][meta[key][2]], 6)
-    data[key]["MAc_2"] = MA_central(data[key][meta[key][2]], 2)
+    data[key]["MAc_3"] = MA_central(data[key][meta[key][2]], 3)
     
 # residuals
     data[key]["e(12)"] = data[key][meta[key][2]] - data[key]["MA_12"]
     data[key]["e(6)"] = data[key][meta[key][2]] - data[key]["MA_6"]
-    data[key]["e(2)"] = data[key][meta[key][2]] - data[key]["MA_2"]
+    data[key]["e(3)"] = data[key][meta[key][2]] - data[key]["MA_3"]
     data[key]["ec(12)"] = data[key][meta[key][2]] - data[key]["MAc_12"]
     data[key]["ec(6)"] = data[key][meta[key][2]] - data[key]["MAc_6"]
-    data[key]["ec(2)"] = data[key][meta[key][2]] - data[key]["MAc_2"]
+    data[key]["ec(3)"] = data[key][meta[key][2]] - data[key]["MAc_3"]
+    # normality test
+#    print(key)
+#    print("\t ec(3) skew %.3f" %(data[key]["ec(3)"].skew()))
+#    print("\t ec(3) kurtosis %.3f" %(data[key]["ec(3)"].kurtosis()))
+#    IID_test(key, "ec(3)")
+#    IID_test(key, "R")
 
-    
 # Visualise
     # Overal trends
 #    Compare(data["google"][meta["google"][2]], "Google Trends (%)", data[key][meta[key][2]], "%s" %(key), "Google Trends v %s" %(meta[key][2]))
+#    print("Corr(google, %s): " %(key), data[key][meta[key][2]].corr(data["google"]["Top5"]))
     # Index and regressor
 #    plot_regressors(key, meta[key][2], key)
     # Autocorrelation
-#    plot_ACF(key, "%s ACF" %(key))
+#    plot_ACF(key, meta[key][2], "%s ACF" %(key))
+#    plot_ACF(key, "ec(3)", "residual ACF: %s" %(key))
+    plot_ACF(key, "R", "residual ACF: %s" %(key))
     # residual plots
 #    plot_residuals(key, "%s residuals" %(key))
-    
+#    distribution(key, "ec(12)", "ec(12) Residual distribution: %s" %(key))
+#    distribution(key, "R", "Returns destribution: %s" %(key))
 
 
