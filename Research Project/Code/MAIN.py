@@ -184,24 +184,25 @@ for key in meta.keys():
 
 # Visualise
     # Overal trends
-    Compare(data["google"][meta["google"][2]], "Google Trends (%)", data[key][meta[key][2]], key, "Google Trends v %s" %(key))
+#    Compare(data["google"][meta["google"][2]], "Google Trends (%)", data[key][meta[key][2]], key, "Google Trends v %s" %(key))
     # Index and regressor
-    plot_regressors(key, [12,3], "12 and 3 forward rolling window MA- %s" %(key), central="false")
-    plot_regressors(key, [3], "central and forward 3 rolling window MA- %s" %(key), central="both")
+#    plot_regressors(key, [12,3], "12 and 3 forward rolling window MA- %s" %(key), central="false")
+#    plot_regressors(key, [3], "central and forward 3 rolling window MA- %s" %(key), central="both")
     # Autocorrelation
-    plot_ACF(key, meta[key][2], "%s ACF" %(key))
-    plot_ACF(key, "ec(3)", "ec(3) residual ACF- %s" %(key))
-    plot_ACF(key, "R", "Return ACF- %s" %(key))
+#    plot_ACF(key, meta[key][2], "%s ACF" %(key))
+#    plot_ACF(key, "ec(3)", "ec(3) residual ACF- %s" %(key))
+#    plot_ACF(key, "R", "Return ACF- %s" %(key))
     # residual plots
-    plot_residuals(key, [3],  "%s residuals e(3), ec(3)" %(key), central="both")
-    plot_residuals(key, [12,3],  "%s residuals (central window) ec(3),ec(12)" %(key), central="true")
-    distribution(key, ["ec(3)"], "ec(%i) Residual distribution: %s" %(3,key))
-    distribution(key, ["R"], "Returns destribution: %s" %(key))
+#    plot_residuals(key, [3],  "%s residuals e(3), ec(3)" %(key), central="both")
+#    plot_residuals(key, [12,3],  "%s residuals (central window) ec(3),ec(12)" %(key), central="true")
+#    distribution(key, ["ec(3)"], "ec(%i) Residual distribution: %s" %(3,key))
+#    distribution(key, ["R"], "Returns destribution: %s" %(key))
     # normality test
-    print(key)
-    print("\t ec(3) skew %.3f" %(data[key]["ec(3)"].skew()))
-    print("\t ec(3) kurtosis %.3f" %(data[key]["ec(3)"].kurtosis()))
-    Normal_test(key, "ec(3)")
-    Normal_test(key, "R")
+#    print(key)
+#    print("\t ec(3) skew %.3f" %(data[key]["ec(3)"].skew()))
+#    print("\t ec(3) kurtosis %.3f" %(data[key]["ec(3)"].kurtosis()))
+#    Normal_test(key, "ec(3)")
+#    Normal_test(key, "R")
+    # seasonal decompose
 
 
