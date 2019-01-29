@@ -30,18 +30,16 @@ def MA_forward(df_in, window):
 def MA_central(df_in, window):
         return df_in.rolling(window, center=True).mean()
 
-def Compare(df_1, yName1, df_2, yName2, Title):
-    r_squared = data[key][meta[key][2]].corr(data["google"]["Top5"])
+def Compare(key1, array1, key2, array2, Title=""):
     fig, ax1 = plt.subplots()
-    df_1.plot(ax=ax1,color='b').xaxis.set_minor_locator(minor_locator)
+    data[key1][array1].plot(ax=ax1,color='b').xaxis.set_minor_locator(minor_locator)
     ax1.set_xlabel('Date')
-    ax1.set_ylabel(yName1, color='b')
+    ax1.set_ylabel(array1, color='b')
     ax1.tick_params('y', colors='b')
     plt.grid()
-    plt.text("2005-01-01", 100, r"$r^2=$ "+"%.2f" %(r_squared))
     ax2 = ax1.twinx()
-    df_2.plot(ax=ax2,color='r')
-    ax2.set_ylabel(yName2, color='r')
+    data[key2][array2].plot(ax=ax2,color='r')
+    ax2.set_ylabel(array2, color='r')
     ax2.tick_params('y', colors='r')
     plt.title(Title)
     plt.savefig("%s\%s.png" %(PATH, Title))
@@ -205,4 +203,11 @@ for key in meta.keys():
 #    Normal_test(key, "R")
     # seasonal decompose
 
-
+def cross_corr(key1, array1, key2, array2):
+    x = data[key1][array1].values
+    y = data[key2][array2].values
+    r_xy = []
+    for i in range(len(x)-1):
+        nom = sum((x-x.mean())*(y.shift(i)-y.mean()))
+        denom = sum((((x-x.mean())**2)**0.5)*(((y.shift(i)-y.mean())**2)**0.5))
+        r_xy.append(nom/denom)
