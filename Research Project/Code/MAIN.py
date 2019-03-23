@@ -1,11 +1,12 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import AutoMinorLocator # for time series visualisation
-from statsmodels.tsa.stattools import adfuller
-#from statsmodels.graphics.tsaplots import plot_acf
+from statsmodels.tsa.stattools import adfuller, pacf, acf
 from pandas.plotting import autocorrelation_plot
-from scipy.stats import shapiro # shapiro wilk test for normality sample size thousands or fewer
-from scipy.stats import probplot
+from scipy.stats import shapiro, probplot # shapiro wilk test for normality sample size thousands or fewer
+from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+import numpy as np
+from statsmodels.tsa.arima_model import ARIMA
 
 
 # Functions 
@@ -148,66 +149,124 @@ data ={}
 # Visualise
 minor_locator = AutoMinorLocator(12)
 
+        
+'''
+    # Check for unit root ADF test
+        print("%s: " %(key))
+        UnitRootTest(data[key][meta[key][2]])
+        print("%s First difference (R):" %(key))
+        UnitRootTest(data[key]["R"][1:])
+'''
+
 for key in meta.keys():
 # Import data
     data[key] = importdata(key, meta[key][0], meta[key][1])
-    
-# Calculate Returns
+  
+if __name__ == "__main__":
+    # Calculate Returns
     data[key]["R"] = data[key][meta[key][2]].shift(1) / data[key][meta[key][2]] -1
+
+    for key in meta.keys():
+    # Moving averages
+        data[key]["MA_12"] = MA_forward(data[key][meta[key][2]], 12)
+        data[key]["MA_6"] = MA_forward(data[key][meta[key][2]], 6)
+        data[key]["MA_3"] = MA_forward(data[key][meta[key][2]], 3)
+        data[key]["MAc_12"] = MA_central(data[key][meta[key][2]], 12)
+        data[key]["MAc_6"] = MA_central(data[key][meta[key][2]], 6)
+        data[key]["MAc_3"] = MA_central(data[key][meta[key][2]], 3)
+        
+    # residuals
+        data[key]["e(12)"] = data[key][meta[key][2]] - data[key]["MA_12"]
+        data[key]["e(6)"] = data[key][meta[key][2]] - data[key]["MA_6"]
+        data[key]["e(3)"] = data[key][meta[key][2]] - data[key]["MA_3"]
+        data[key]["ec(12)"] = data[key][meta[key][2]] - data[key]["MAc_12"]
+        data[key]["ec(6)"] = data[key][meta[key][2]] - data[key]["MAc_6"]
+        data[key]["ec(3)"] = data[key][meta[key][2]] - data[key]["MAc_3"]
     
-'''
-# Check for unit root ADF test
-    print("%s: " %(key))
-    UnitRootTest(data[key][meta[key][2]])
-    print("%s First difference (R):" %(key))
-    UnitRootTest(data[key]["R"][1:])
-'''
-
-for key in meta.keys():
-# Moving averages
-    data[key]["MA_12"] = MA_forward(data[key][meta[key][2]], 12)
-    data[key]["MA_6"] = MA_forward(data[key][meta[key][2]], 6)
-    data[key]["MA_3"] = MA_forward(data[key][meta[key][2]], 3)
-    data[key]["MAc_12"] = MA_central(data[key][meta[key][2]], 12)
-    data[key]["MAc_6"] = MA_central(data[key][meta[key][2]], 6)
-    data[key]["MAc_3"] = MA_central(data[key][meta[key][2]], 3)
+    # Visualise
+        # Overal trends
+    #    Compare(data["google"][meta["google"][2]], "Google Trends (%)", data[key][meta[key][2]], key, "Google Trends v %s" %(key))
+        # Index and regressor
+    #    plot_regressors(key, [12,3], "12 and 3 forward rolling window MA- %s" %(key), central="false")
+    #    plot_regressors(key, [3], "central and forward 3 rolling window MA- %s" %(key), central="both")
+        # Autocorrelation
+    '''
+    ARIMA(p,d,0)
+    if ACF is exponentially decaying or sinusodial 
+    there is a significant spike at lag p in the PACF, but none beyond lag
+    (if ACF and PACF are swapped then use ARIMA(0,d,q))
+    ols or ywunbiased
+    plot_pacf(data["SP500"][meta["SP500"][2]],method="ols")
+    plot_pacf(data["SP500"][meta["SP500"][2]],method="ywunbiased")
+    '''
+    #    plot_ACF(key, meta[key][2], "%s ACF" %(key))
+    #    plot_ACF(key, "ec(3)", "ec(3) residual ACF- %s" %(key))
+    #    plot_ACF(key, "R", "Return ACF- %s" %(key))
+        # residual plots
+    #    plot_residuals(key, [3],  "%s residuals e(3), ec(3)" %(key), central="both")
+    #    plot_residuals(key, [12,3],  "%s residuals (central window) ec(3),ec(12)" %(key), central="true")
+    #    distribution(key, ["ec(3)"], "ec(%i) Residual distribution: %s" %(3,key))
+    #    distribution(key, ["R"], "Returns destribution: %s" %(key))
+        # normality test
+    #    print(key)
+    #    print("\t ec(3) skew %.3f" %(data[key]["ec(3)"].skew()))
+    #    print("\t ec(3) kurtosis %.3f" %(data[key]["ec(3)"].kurtosis()))
+    #    Normal_test(key, "ec(3)")
+    #    Normal_test(key, "R")
+        # seasonal decompose
+    '''
+    def cross_corr(key1, array1, key2, array2):
+        x = data[key1][array1].values
+        y = data[key2][array2].values
+        r_xy = []
+        for i in range(len(x)-1):
+            nom = sum((x-x.mean())*(y.shift(i)-y.mean()))
+            denom = sum((((x-x.mean())**2)**0.5)*(((y.shift(i)-y.mean())**2)**0.5))
+            r_xy.append(nom/denom)
+    '''
     
-# residuals
-    data[key]["e(12)"] = data[key][meta[key][2]] - data[key]["MA_12"]
-    data[key]["e(6)"] = data[key][meta[key][2]] - data[key]["MA_6"]
-    data[key]["e(3)"] = data[key][meta[key][2]] - data[key]["MA_3"]
-    data[key]["ec(12)"] = data[key][meta[key][2]] - data[key]["MAc_12"]
-    data[key]["ec(6)"] = data[key][meta[key][2]] - data[key]["MAc_6"]
-    data[key]["ec(3)"] = data[key][meta[key][2]] - data[key]["MAc_3"]
-
-# Visualise
-    # Overal trends
-#    Compare(data["google"][meta["google"][2]], "Google Trends (%)", data[key][meta[key][2]], key, "Google Trends v %s" %(key))
-    # Index and regressor
-#    plot_regressors(key, [12,3], "12 and 3 forward rolling window MA- %s" %(key), central="false")
-#    plot_regressors(key, [3], "central and forward 3 rolling window MA- %s" %(key), central="both")
-    # Autocorrelation
-#    plot_ACF(key, meta[key][2], "%s ACF" %(key))
-#    plot_ACF(key, "ec(3)", "ec(3) residual ACF- %s" %(key))
-#    plot_ACF(key, "R", "Return ACF- %s" %(key))
-    # residual plots
-#    plot_residuals(key, [3],  "%s residuals e(3), ec(3)" %(key), central="both")
-#    plot_residuals(key, [12,3],  "%s residuals (central window) ec(3),ec(12)" %(key), central="true")
-#    distribution(key, ["ec(3)"], "ec(%i) Residual distribution: %s" %(3,key))
-#    distribution(key, ["R"], "Returns destribution: %s" %(key))
-    # normality test
-#    print(key)
-#    print("\t ec(3) skew %.3f" %(data[key]["ec(3)"].skew()))
-#    print("\t ec(3) kurtosis %.3f" %(data[key]["ec(3)"].kurtosis()))
-#    Normal_test(key, "ec(3)")
-#    Normal_test(key, "R")
-    # seasonal decompose
-
-def cross_corr(key1, array1, key2, array2):
-    x = data[key1][array1].values
-    y = data[key2][array2].values
-    r_xy = []
-    for i in range(len(x)-1):
-        nom = sum((x-x.mean())*(y.shift(i)-y.mean()))
-        denom = sum((((x-x.mean())**2)**0.5)*(((y.shift(i)-y.mean())**2)**0.5))
-        r_xy.append(nom/denom)
+    def corr(key1="google", array1="Top5", key2="RDPI", array2="DSPIC96"):
+        x = data[key1][array1].dropna()
+        y = data[key2][array2].dropna()
+        lg = len(x)
+        lags = np.arange(-lg+1, lg)
+        autocorr_xr = np.correlate(x, y, mode='full')
+        autocorr_xr /= max(autocorr_xr)
+        fig, ax = plt.subplots()
+        ax.plot(lags, autocorr_xr, 'b')
+        ax.set_xlabel('lag')
+        ax.set_ylabel('correlation coefficient')
+        ax.grid()
+        Title = "%s_vs_%s_cross_correaltion" %(key1, key2)
+        plt.title(Title)
+        
+        
+        def plt_acf(key, array, lags=40, alphas=0.05, method="ywunbiased"):
+            ys = pacf(data[key][array].dropna(), alpha=alphas, nlags=lags)
+            xs = range(lags+1)
+            plt.figure()
+            plt.scatter(xs,ys[0])
+            plt.grid()
+            plt.vlines(xs, 0, ys[0])
+            plt.plot(ys[1])
+            
+        def parse_month_list(DF, key=None, array=None):
+            """
+            data must not include incomplete years. 
+            """
+            if key and array: #check this line later
+                dat = data[key][array]
+            else:
+                dat = DF
+            months = [M for M in range(1,13)]
+            dat_months = {}
+            for M in months:
+                val = []
+                for year in range(len(dat)//12):
+                    val.append(dat.iloc[year*12+M-1])
+                dat_months[M] = val
+            plt.boxplot(dat_months.values())
+            return pd.DataFrame.from_dict(dat_months)
+        
+            
+    
