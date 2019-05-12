@@ -42,7 +42,7 @@ def timed(A,B, op="*"):
         ans = input('%.2f * %.2f =' %(A, B))
     endT = time.time()
     elapsed = int(endT-startT)
-    print(f"Time elapsed: {elapsed}s")
+#    print(f"Time elapsed: {elapsed}s")
     return ans, elapsed
     
 
@@ -128,7 +128,7 @@ while True:
         except:
             limit = 600
         
-        while T<limit:
+        while T<limit and question<75:
             # stage 1
             for i in range(30):
                 question += 1
@@ -144,6 +144,7 @@ while True:
                 elif points =="w":
                     grade -= 3 
                 T+= Elapsed
+                print("Total time (seconds):", T)
             
             # stage 2
             for i in range(30):
@@ -159,6 +160,7 @@ while True:
                 elif points =="w":
                     grade -= 1
                 T+= Elapsed
+                print("Total time (seconds):", T)
              
             # stage 3
             for i in range(15):
@@ -175,9 +177,9 @@ while True:
                 elif points =="w":
                     grade -= 2
                 T+= Elapsed
+                print("Total time (seconds):", T)
                 
         print("\n")  
-        print("Total time (seconds): ", T)
         print("Questions:", question)
         print("Points: ", grade)
         
