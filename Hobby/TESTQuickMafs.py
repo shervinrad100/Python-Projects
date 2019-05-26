@@ -9,8 +9,12 @@ import time
 
 
 def gennumber(n1=100,n2=100, dec1=True, dec2=True):
-    a = np.random.randint(0,n1)
-    b = np.random.randint(0,n2)
+    '''
+    generate two random floats between 0 and n1.dec1 and n2.dec2 respectively. 
+    if dec_i=False it will return two integers.
+    '''
+    a = np.random.randint(2,n1)
+    b = np.random.randint(2,n2)
     a2 = round(np.random.random(),2)
     b2 = round(np.random.random(),2)
     if dec1 == True:
@@ -24,7 +28,11 @@ def gennumber(n1=100,n2=100, dec1=True, dec2=True):
     return A,B
 
 
-def timed(A,B, op="*"):
+def timed(A,B, op):
+    '''
+    check the operation and print the question. Get response of user and time it. 
+    returns answer and elapsed time in a tuple. 
+    '''
     startT = time.time()
     if op == "/":
         if A>B:
@@ -47,6 +55,11 @@ def timed(A,B, op="*"):
     
 
 def check(A,B, op, ans):
+    '''
+    checks input against the correct answer and responds; in case of wrong answer
+    correct answer is also printed. Also returns a string to show whether answer is 
+    correct (c), blank (b) or wrong (w).
+    '''
     if op == "*":
         if ans == str(round((A)*(B),2)):
             print('Correct')
@@ -112,76 +125,122 @@ def check(A,B, op, ans):
     return point
 
 
+def choices(A,B):
+    ABC = ["A", "B", "C"]
+    view = {}
+    for j in range(len(ABC)-1):
+        plusminus = np.random.choice([True,False])
+        if plusminus == True:
+            plus = round((1+np.random.random())+(A*B),3)
+            while plus == round((A*B),3):
+                plus = round((1+np.random.random())+(A*B),3)
+            view[np.random.choice(ABC)] = plus
+        else:
+            minus = round((1-np.random.random())+(A*B),3)
+            while minus == round(A*B,3):
+                minus = round((1-np.random.random())+(A*B),3)
+            view[np.random.choice(ABC)] = minus
+    for abc in ABC:
+        if abc in ABC and abc not in view.keys():
+            view[abc] = round((A*B),3)
+        else: pass
+    for abc in sorted(list(view.keys())):
+        print(f"{abc}.", view[abc])
+        
+        
+#def timeout(signal,frame):
+#    raise Exception("time's up!")
+
 operations = ["+", "-", "*", "/", "*", "*"]
-response = ["yes", "y", "t", "true", "+", "q", "quit"]
+quitresponse = ["yes", "y", "t", "true", "+", "q", "quit"]
 
 
 while True:
     Quit = input("Quit? ").lower()
-    if Quit not in response: 
-        
+    if Quit not in quitresponse: 
         T = 0
         question = 0
         grade = 0
-        try:
-            limit = int(input("time limit (seconds): "))+1
-        except:
-            limit = 600
-        
-        while T<limit and question<75:
-            # stage 1
-            for i in range(30):
-                question += 1
-                op = np.random.choice(operations)
-                A,B= gennumber(n1=12,dec1=False, dec2 = False)
-                ans, Elapsed = timed(A, B, op) 
-                points = check(A,B, op, ans)
-                check(A,B,op, ans)
-                if points == "c":
-                    grade += 1
-                elif points == "b":
-                    grade -= 2
-                elif points =="w":
-                    grade -= 3 
-                T+= Elapsed
-                print("Total time (seconds):", T)
+        limit = 600
+        T_end = time.monotonic() + limit
+        try:           
+            while time.monotonic()<T_end and question<75: # use signal instead and remove the time check after the for loops
+                print("\n","stage 1")
+                for i in range(30):
+                    if time.monotonic()<T_end:
+                        question += 1
+                        op = np.random.choice(operations)
+                        A,B= gennumber(n1=12,dec1=False, dec2 = False)
+                        ans, Elapsed = timed(A, B, op) 
+                        points = check(A,B, op, ans)
+                        if points == "c":
+                            grade += 1
+                        elif points == "b":
+                            grade -= 2
+                        elif points =="w":
+                            grade -= 3 
+                        T+= Elapsed
+                        print("Total time (seconds):", T)
+                    else: break
             
-            # stage 2
-            for i in range(30):
-                question += 1
-                op = np.random.choice(operations)
-                A,B= gennumber()
-                ans, Elapsed = timed(A, B, op) 
-                points = check(A,B, op, ans)
-                if points == "c":
-                    grade += 2
-                elif points == "b":
-                    grade -= 1
-                elif points =="w":
-                    grade -= 1
-                T+= Elapsed
-                print("Total time (seconds):", T)
+                print("\n","stage 2")
+                for i in range(15):
+                    if time.monotonic()<T_end:
+                        question += 1
+                        op = np.random.choice(operations)
+                        A,B= gennumber(n1=12, n2=12, dec2=False)
+                        ans, Elapsed = timed(A, B, op) 
+                        points = check(A,B, op, ans)
+                        if points == "c":
+                            grade += 2
+                        elif points == "b":
+                            grade -= 1
+                        elif points =="w":
+                            grade -= 1
+                        T+= Elapsed
+                        print("Total time (seconds):", T)
+                    else: break
+                for i in range(15):
+                    if time.monotonic()<T_end:
+                        question += 1
+                        op = np.random.choice(operations)
+                        A,B= gennumber(n1=12, dec2=False)
+                        ans, Elapsed = timed(A, B, op) 
+                        points = check(A,B, op, ans)
+                        if points == "c":
+                            grade += 2
+                        elif points == "b":
+                            grade -= 1
+                        elif points =="w":
+                            grade -= 1
+                        T+= Elapsed
+                        print("Total time (seconds):", T)
+                    else: break
              
-            # stage 3
-            for i in range(15):
-                question += 1
-                op = "*"
-                A,B= gennumber(n1=1000)
-                ans, Elapsed = timed(A, B, op) 
-                points = check(A,B, op, ans)
-                check(A,B,op, ans)
-                if points == "c":
-                    grade += 2
-                elif points == "b":
-                    grade -= 1
-                elif points =="w":
-                    grade -= 2
-                T+= Elapsed
-                print("Total time (seconds):", T)
-                
-        print("\n")  
-        print("Questions:", question)
-        print("Points: ", grade)
+                print("\n","stage 3")
+                for i in range(15):
+                    if time.monotonic()<T_end:
+                        question += 1
+                        op = "*"
+                        A,B= gennumber(n1=1000)
+                        choices(A,B)
+                        ans, Elapsed = timed(A, B, op) 
+                        points = check(A,B, op, ans)
+                        if points == "c":
+                            grade += 2
+                        elif points == "b":
+                            grade -= 1
+                        elif points =="w":
+                            grade -= 2
+                        T+= Elapsed
+                        print("Total time (seconds):", T)
+                    else: break
+                    
+        except:
+            print("\n")  
+            print("Total time (seconds): ", T)
+            print("Questions:", question)
+            print("Points: ", grade)
         
     else:
         print("Total time (seconds): ", T)
