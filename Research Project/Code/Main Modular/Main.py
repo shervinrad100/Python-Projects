@@ -3,7 +3,7 @@
 ## TODO: merge garch-var 
 
 from DataManipulation import * 
-from Plotters import *
+dwfrom Plotters import *
 from Statisticalz import *
 
 # from statsmodels.tsa.arima_model import ARIMA
