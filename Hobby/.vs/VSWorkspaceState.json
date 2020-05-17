@@ -1,7 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Scraping"
   ],
-  "SelectedNode": "\\Threading_quickMafs.py",
+  "SelectedNode": "\\Scraping\\Scrape-to-DB test.py",
   "PreviewInSolutionExplorer": false
 }
