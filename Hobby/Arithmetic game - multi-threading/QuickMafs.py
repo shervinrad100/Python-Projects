@@ -1,3 +1,6 @@
+# exercise to improve arithmetic maths 
+
+
 import numpy as np 
 import time
 
