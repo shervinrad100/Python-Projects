@@ -4,161 +4,135 @@
 import numpy as np 
 import time
 
-print('Welcome to the \'quick mafs\' practice game' )
-counter = 0
+print('Welcome to the \'quick mafs\' practice game' ) # implement negative marks 
+question = 0
 score = 0
 
-def gennumber():
-    a = np.random.randint(0,999)
-    b = np.random.randint(0,999)
+def gennumber(a_large=False, start=2):
+    """
+    generates four numbers:
+    - two random integers between 2 and 100 with option to choose a > b and the min of range
+    - two decimals with 0.01 precision between 0 and 1
+    """
+    a = np.random.randint(start,999)
+    b = np.random.randint(start,999)
     a2 = round(np.random.random(),2)
     b2 = round(np.random.random(),2)
-    while b > a:    
-        b = np.random.randint(0,999)
-    global counter                                                              # is this right?
-    counter +=1    
-    startT = time.time()
-    ans = input('%.2f - %.2f =' %(a, b))
-    endT = time.time()
-    print(f"Time elapsed: {int(endT-startT)}s")
-    return a,b,a2,b2, ans
+    if a_large:
+        while b < a:
+            b = np.random.randint(2,999)
+    return a,b,a2,b2
+
+
 
  # The game:
-while True:
-    print('If you wish to quit, please enter: \' quit \'')
-    print('For help, please enter: \' help \'')
-    ez = input("Easy (True), or hard (False)? ").upper()
-    EZ = ["TRUE" , "T" , "+"]
-    if ez in EZ:
-        ez = True
-    elif ez == "quit":                                                          # not working?
-        break
-    else:
-        ez = False
-    math = input('Please choose from: +, -, *, / \n')
+def play():
+    while True:
+        # Main Menu
+        print('If you wish to quit, please enter: \' quit \'')
+        ez = input("choose difficulty: Easy (True), or hard (False)? ").lower()
+        
+        if ez == "quit":
+            break
+        elif ["ez" for t in list(ez) if t == "t"]:
+            ez = True
+        else:
+            ez = False
+        
+        print('For help, please enter: \' help \'')
+        math = input('Please choose from: +, -, *, / \n')
 
-# Subtraction
-    if math == '-':
-        a = np.random.randint(0,999)
-        b = np.random.randint(0,999)
-        a2 = round(np.random.random(),2)
-        b2 = round(np.random.random(),2)
-       # Only generate numbers that will give positive results
-        while b > a:    
-            b = np.random.randint(0,999)
-        if ez == True:
+    # Subtraction
+        if math == '-':
+            a,b,a2,b2 = gennumber(True)
+            question += 1 
+        # Only generate numbers that will give positive results
+            if not ez:
+                a += a2
+                b += b2
+            
             startT = time.time()
             ans = input('%.2f - %.2f =' %(a, b))
             endT = time.time()
             print(f"Time elapsed: {int(endT-startT)}s")
-            if ans == str(a-b):
+            if ans == str(round(a-b,2)):
                 print('Correct')
+                score += 1
             else:
                 print('Wrong')
-                print(a-b)
-        elif ez == False:
-            startT = time.time()
-            ans = input('%.2f - %.2f =' %(a+a2, b+b2))
-            endT = time.time()
-            print(f"Time elapsed: {int(endT-startT)}s")
-            if ans == str(round(a+a2-(b+b2),2)):
-                print('Correct')
-            else:
-                print('Wrong')
-                print(round(a+a2-(b+b2),2))
+                print(round(a-b,2))
+            
 
-# Summation    
-    elif math == '+':
-        a = np.random.randint(0,999)
-        b = np.random.randint(0,999)
-        a2 = round(np.random.random(),2)
-        b2 = round(np.random.random(),2)
-        if ez == True:
+    # Summation    
+        elif math == '+':
+            a,b,a2,b2 = gennumber(False, 0)
+            question += 1
+            if not ez:
+                a += a2
+                b += b2
+            
             startT = time.time()
             ans = input('%.2f + %.2f =' %(a, b))
             endT = time.time()
             print(f"Time elapsed: {int(endT-startT)}s")
-            if ans == str(a+b):
+            if ans == str(round(a+b,2)):
                 print('Correct')
+                score += 1
             else:
                 print('Wrong')
-                print(a+b)
-        elif ez == False:
-            startT = time.time()
-            ans = input('%.2f + %.2f =' %(a+a2, b+b2))
-            endT = time.time()
-            print(f"Time elapsed: {int(endT-startT)}s")
-            if ans == str(round(a+a2+b+b2,2)):
-                print('Correct')
-            else:
-                print('Wrong')
-                print(round((a+a2+b+b2),2))
+                print(round(a+b,2))
+            
 
-# Multiplication      
-    elif math == '*':
-        a= np.random.randint(2,100)
-        b= np.random.randint(2,100)
-        a2 = round(np.random.random(),2)
-        b2 = round(np.random.random(),2)
-        if ez == True:
+    # Multiplication      
+        elif math == '*':
+            a,b,a2,b2 = gennumber(False)
+            question += 1
+            if not ez:
+                a += a2
+                b += b2
+
             startT = time.time()
             ans = input('%.2f * %.2f =' %(a, b))
             endT = time.time()
             print(f"Time elapsed: {int(endT-startT)}s")
-            if ans == str(a*b):
+            if ans == str(round(a*b,2)):
                 print('Correct')
+                score += 1
             else:
                 print('Wrong')
-                print(a*b)
-        elif ez == False:
-            startT = time.time()
-            ans = input('%.2f * %.2f =' %(a+a2, b+b2))
-            endT = time.time()
-            print(f"Time elapsed: {int(endT-startT)}s")
-            if ans == str((a+a2)*(b+b2)):
-                print('Correct')
-            else:
-                print('Wrong')
-                print((a+a2)*(b+b2))
+                print(round(a*b,2))
+            
 
-# Division
-    elif math == '/':
-        a= np.random.randint(2,100)
-        b= np.random.randint(2,100)
-        a2= round(np.random.random(),2)
-        b2 = round(np.random.random(),2)
-        while b > a:    
-            b = np.random.randint(2,100)
-        if ez == True:
+    # Division
+        elif math == '/':
+            a,b,a2,b2 = gennumber(True)
+            question += 1
+            if not ez:
+                a += a2
+                b += b2
+        
             startT = time.time()
             ans = input('%.2f / %.2f =' %(a, b))
             endT = time.time()
             print(f"Time elapsed: {int(endT-startT)}s")
-            if ans == str(round((a)/(b)),2):
+            if ans == str(round(a/b),2):
                 print('Correct')
+                score += 1
             else:
                 print('Wrong')
-                print("%.2f" %((a)/(b)))
-        elif ez == False:
-            startT = time.time()
-            ans = input('%.2f / %.2f =' %(a+a2, b+b2))
-            endT = time.time()
-            print(f"Time elapsed: {int(endT-startT)}s")
-            if ans == str((a+a2)/(b+b2)):
-                print('Correct')
-            else:
-                print('Wrong')
-                print("%.2f" %((a+a2)/(b+b2)))
+                print("%.2f" %(round(a/b,2)))
+            
+        elif math == 'quit':
+            break
         
-    elif math == 'quit':
-        break
-    
-    elif math == 'help':
-        print('The aim of the game is for you to practice your mental maths skills.',
-              'You can choose one of the four main operations to practice.',
-              'Two random numbers will be generated and you will need to enter your answer.')
+        elif math == 'help':
+            print('The aim of the game is for you to practice your mental maths skills.',
+                'You can choose one of the four main operations to practice.',
+                'Two random numbers will be generated and you will need to enter your answer.')
+            
+        else:
+            continue
         
-    else:
-        continue
-    
-print('Thanks for playing')
+    print('Thanks for playing')
+if __name__ == "__main__":
+    play()
