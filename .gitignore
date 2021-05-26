@@ -1,5 +1,9 @@
 /.metadata/
 
+*.pyc
+
+__pycache__ 
+
 Facebook_files
 
 Facebook.html
