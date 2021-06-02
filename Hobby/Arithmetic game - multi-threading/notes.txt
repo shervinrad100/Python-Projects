@@ -15,10 +15,6 @@
             your answer. 
             
 # Problems 
-    - it sort of works when you use threading but the problem is that
-    if you type in your answer before the time is up you get a random text
-    pop up saying that youre too late even when you have finished the question.
-
     - The problem with multiprocessing is that the Global Interpreter Lock (GIL) 
     doesnt allow I/O when parallel processing. Also, because each process has an 
     independent GIL, the processes cant write to a shared object. 
