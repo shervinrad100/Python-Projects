@@ -44,7 +44,8 @@ def play(math, ez):
             return True
         else:
             print('Wrong')
-            print(round(a-b,2))
+            print("Answer:",round(a-b,2))
+            return False
         
 
 # Summation    
@@ -64,7 +65,8 @@ def play(math, ez):
             return True
         else:
             print('Wrong')
-            print(round(a+b,2))
+            print("Answer:",round(a+b,2))
+            return False
         
 
 # Multiplication      
@@ -84,7 +86,8 @@ def play(math, ez):
             return True
         else:
             print('Wrong')
-            print(round(a*b,2))
+            print("Answer:",round(a*b,2))
+            return False
         
 
 # Division
@@ -104,7 +107,8 @@ def play(math, ez):
             return True
         else:
             print('Wrong')
-            print("%.2f" %(round(a/b,2)))
+            print("Answer: %.2f" %(round(a/b,2)))
+            return False
             
         
 
