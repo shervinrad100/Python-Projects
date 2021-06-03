@@ -2,6 +2,10 @@
 
 *.pyc
 
+.vs
+
+.ipynb_checkpoints
+
 __pycache__ 
 
 Facebook_files
