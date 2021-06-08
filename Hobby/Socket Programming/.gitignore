@@ -1,0 +1,6 @@
+activ.bat
+netstat.txt
+server_info.json
+sockets-tcp-flow.webp
+.vscode/*
+__pycache__/*
