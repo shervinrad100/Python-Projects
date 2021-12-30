@@ -1,0 +1,12 @@
+{
+    "window_x_lim": 400,
+    "rendering": true,
+    "window_y_lim": 300,
+    "blocksize": 10,
+    "snake_speed": 13,
+    "fontsize" : 50,
+    "ini_direction": [
+        1,
+        0
+    ]
+}

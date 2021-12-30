@@ -5,11 +5,11 @@ class Food():
     """
     only occupies one space and spawns randomly on a world
     """
-    def __init__(self, world):
+    def __init__(self, world, blocksize):
         """init with world object"""
         self.world = world
-        self.x = rn.randint(0, world.width - 1)
-        self.y = rn.randint(0, world.height - 1)
+        self.x = rn.randint(0, world.width - blocksize)
+        self.y = rn.randint(0, world.height - blocksize)
 
     def draw(self):
         size = self.world.blocksize
