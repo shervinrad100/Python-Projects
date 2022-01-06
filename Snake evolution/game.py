@@ -1,9 +1,3 @@
-# BUG
-# snake movement is jumpy 
-    # the collisions with food has issues
-    # left edge of map is pushed to the right
-
-
 from model.Food import Food
 from model.Snake import Snake
 from model.World import World
