@@ -1,28 +1,30 @@
 # BUG
-# the network_shape is misunderstood because you get an error on line 28
-# TypeError: unsupported operand type(s) for +: 'int' and 'tuple'
+# why matrix mismatch? output seems to be just one number?
+# what if decision has two numbers that are max? 
+# TODO
+# ValueError to explain why matrix dimensions dont match
 
 import random
 import numpy as np
 
 
-class Brain():
+class Brain:
     """
      The brain can make a decision to turn left or right or go straight (output shape should always be 3)
     """
     
     chosen_colours = set()
     
-    def __init__(self, network_shape, output='tanh'):
+    def __init__(self, network_shape, activation_function='tanh'):
         """
-        network shape is a list of tuples of length 2 representing layer information input and output shapes. I.e.
-            network_shape = [(1,12),(12,12),(12,1)] is a 3 layer network. 
-        First layer has 1 input and 12 outputs, second is 12 inputs and outputs and last layer has 12 inputs and a single output
+        Class will initialise with a network shape as a list of integers representing number of nodes in each layer. 
+        I.e. network_shape = [6,12,3] is a 3 layer network with 6, 12 and 3 neurons in each layer respectively.
         """
         self.colour = Brain.set_colour()
         # create network structure
+        self.network_shape = network_shape
         self.weights, self.biases = [], []
-        self.output = Brain._activation(output)
+        self.output = Brain._activation(activation_function)
         # initialise the weights (Glorot Normal initialisation as a factor of shape)
         for i in range(len(network_shape)-1):
             shape = (network_shape[i], network_shape[i+1])
@@ -41,33 +43,31 @@ class Brain():
 
     @staticmethod
     def _activation(type):
-        if type == "softmax":
+        if type == "softmax": # needs to be checked 
             return lambda X : np.exp(X) / np.sum(np.exp(X), axis=1).reshape(-1, 1)
         elif type == "tanh":
-            return lambda X: np.tanh(np.sum(X))
+            return lambda X: np.tanh(X)
         elif type == 'sigmoid':
             return lambda X : (1 / (1 + np.exp(-X)))
         else:
-            raise ValueError('Invalid activation. Select from ["softmax", "sigmoid", "tanh"]') 
+            raise ValueError('Invalid activation. Select from ["softmax", "sigmoid", "tanh"]')
 
-    def predict(self, X):
+    def decision(self, X):
         """
-        input a numpy ndarray 
-        X must have ndim == 2 first dimension being the input and 2nd being the output
+        X is a numpy array with shape (1,network_shape[0]) that will be fed through the network
+        output will be a tuple of len(network_shape[-1])
+        
         """
-        # if processing hidden layers, input shape must match layer inputs
-        if X.ndim != 2:
-            raise ValueError("Input has dimensions {}. Expected X.ndim == 2".format(X.ndim))
-        # if processing input layer, input shape must match input layer dimensions
-        if X.shape[1] != self.weights[0].shape[0]:
-            raise ValueError('Input has {} features, expected {}'.format(X.shape[1], self.weights[0].shape[0]))
-        for i, (weights, bias) in enumerate(zip(self.weights, self.biases)):
-            X = np.dot(X, weights) + np.dot(np.ones(X.shape[0], 1), bias) # X = X.W + B
+        for i, (W, B) in enumerate(zip(self.weights, self.biases)):
+            try:
+                X = np.dot(X, W) + B 
+            except ValueError:
+                print("Matrix Shape mismatch")
             if i == len(self.weights) - 1:
-                X = self.output(X) # _activation(type)
+                X = self.output(X).reshape(-1) # _activation(type)
             else:
-                X = max(0,X) # ReLU
-        return np.argmax(X, axis=1).reshape((-1, 1))
+                X = np.clip(X, 0, np.inf) # ReLU
+        return [0 if i != max(X) else 1 for i in X] 
 
     def mutate(self, mutation_std=0.05):
         """Mutate the Brain's weights in place."""
@@ -75,5 +75,20 @@ class Brain():
             self.weights[i] += np.random.normal(0, mutation_std, self.weights[i].shape)
             self.biases[i] += np.random.normal(0, mutation_std, self.biases[i].shape)
 
-    def see(self):
+    def see(self, food=True, lethal=False):
+        food_coord, lethal_coord = None, None
+        if not lethal_coord == None:
+            return np.array([*food_coord, *lethal_coord]).reshape(1,self.network_shape[0])
+        else:
+            return np.array(food_coord).reshape(1,self.network_shape[0])
         pass
+
+
+# tests
+# network_shape = [6,12,12,12,3]
+# bren = Brain(network_shape)
+# food_coord = (1,0,0)
+# lethal_coord = (0,0,1)
+# input = np.array([*food_coord, *lethal_coord]).reshape(1,network_shape[0])
+# move = bren.decision(input)
+# print(move)
