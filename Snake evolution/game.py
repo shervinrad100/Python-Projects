@@ -39,17 +39,10 @@ except:
     "window_y_lim": 300,
     "blocksize": 10,
     "snake_speed": 10,
-    "fontsize" : 50,
-    "ini_direction": [
-        1,
-        0
-    ] 
-    
+    "fontsize" : 50    
 }
 
 score = 0
-direction = tuple(CONFIG["ini_direction"])
-move_input = tuple(map(lambda dx: dx * CONFIG["blocksize"], direction))
 #####################
 
 def render_text(window, txt, colour, loc=None, alpha=255):
@@ -108,6 +101,7 @@ font = pygame.font.Font(None, CONFIG["fontsize"])
 # init world 
 world = World(CONFIG["window_x_lim"], CONFIG["window_y_lim"], CONFIG["blocksize"], window=window)
 snake1 = Snake(world, init_len=1)
+move_input = tuple(map(lambda dx: dx * CONFIG["blocksize"], snake1.direction))
 food = Food(world, world.blocksize)
 
 # main game loop
@@ -149,8 +143,8 @@ while True:
     #pygame.draw.rect(window, RED, pygame.Rect(0, 0, 2*world.blocksize, world.height))
 
     # if vectors are orthogonal you can change direction else ignore
-    if sum([x1y1*x2y2 for x1y1,x2y2 in list(zip(move_input, direction))]) == 0:
-        direction = move_input
+    if sum([x1y1*x2y2 for x1y1,x2y2 in list(zip(move_input, snake1.direction))]) == 0:
+        snake1.direction = move_input
 
     # snake finds food
     snakehead = snake1.body[0]
@@ -160,7 +154,7 @@ while True:
         score += 1
 
 	# Moving the snake
-    if not snake1.move(*direction):
+    if not snake1.move(*snake1.direction):
         if score > highscore: 
             highscore = score
             with open("savefiles/highscore.txt", "w") as file:

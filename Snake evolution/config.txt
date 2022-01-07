@@ -4,9 +4,5 @@
     "window_y_lim": 450,
     "blocksize": 10,
     "snake_speed": 15,
-    "fontsize" : 50,
-    "ini_direction": [
-        1,
-        0
-    ]
+    "fontsize" : 50
 }
