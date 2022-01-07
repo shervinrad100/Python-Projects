@@ -1,6 +1,4 @@
 # BUG 
-# absolute direction moves in increments of 10??
-# absolute_periphery has len == 2?? why?
 
 # TODO
 # make snake have sense of direction (move direction from game to snake)
@@ -15,6 +13,11 @@ class Snake():
     """
     snake occupies a space from head to tail and cant go back on itself.
     """
+    angles = (np.pi/2, 0, -np.pi/2)
+    rotation_matrix = lambda phi: ((np.around(np.cos(phi), decimals=4), -np.sin(phi)),
+                                    (np.sin(phi), np.around(np.cos(phi), decimals=4))) 
+    rotation_2d = lambda phi, dxdy: np.dot(rotation_matrix(phi), np.transpose(dxdy))
+
     def __init__(self, world, init_len=1, init_pos=None, brain = None):
         """
         init with world object so that snake can spawn at a random location on that world
@@ -28,7 +31,7 @@ class Snake():
         else:
             x = rn.randint(world.width //2 - world.width//4, world.width //2 + world.width//4)
             y = rn.randint(world.height //2 - world.height//4, world.height //2 + world.height//4)
-        
+        self.periphery_relative = None
         self.direction = (1,0)
         self.body = []
         for i in range(0,init_len):
@@ -73,12 +76,8 @@ class Snake():
         rotate direction eigenvector and if it collides with food or lethals return 1
         """
         head_pos = self.body[0]
-        angles = (np.pi/2, 0, -np.pi/2)
-        rotation_matrix = lambda phi: ((np.around(np.cos(phi), decimals=4), -np.sin(phi)),
-                                        (np.sin(phi), np.around(np.cos(phi), decimals=4))) 
-        rotation_2d = lambda phi, dxdy: np.dot(rotation_matrix(phi), np.transpose(dxdy))
         # L,F,R directions relative to head direction
-        periphery_relative = [rotation_2d(phi, self.direction) for phi in angles]
+        self.periphery_relative = [Snake.rotation_2d(phi, self.direction) for phi in Snake.angles]
         # L,F,R directions absolute coordinates
         periphery_absolute = list(tuple(map(sum, zip(periphery, head_pos))) for periphery in periphery_relative)
         # L,F,R direction of food relative to head direction
