@@ -1,8 +1,9 @@
 # BUG
-# why matrix mismatch? output seems to be just one number?
 # what if decision has two numbers that are max? 
 # TODO
 # ValueError to explain why matrix dimensions dont match
+# mutation method is not good enough. make it so that it selects the weights randomly and assigns a new value instead of changing all of them. 
+# the std of mutation must not be fixed and should depend on the current weights 
 
 import random
 import numpy as np
@@ -56,7 +57,7 @@ class Brain:
         """
         X is a numpy array with shape (1,network_shape[0]) that will be fed through the network
         output will be a tuple of len(network_shape[-1])
-        
+        input needs to be flattened         
         """
         for i, (W, B) in enumerate(zip(self.weights, self.biases)):
             try:
@@ -74,14 +75,6 @@ class Brain:
         for i in range(len(self.weights)):
             self.weights[i] += np.random.normal(0, mutation_std, self.weights[i].shape)
             self.biases[i] += np.random.normal(0, mutation_std, self.biases[i].shape)
-
-    def see(self, food=True, lethal=False):
-        food_coord, lethal_coord = None, None
-        if not lethal_coord == None:
-            return np.array([*food_coord, *lethal_coord]).reshape(1,self.network_shape[0])
-        else:
-            return np.array(food_coord).reshape(1,self.network_shape[0])
-        pass
 
 
 # tests
