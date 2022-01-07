@@ -1,9 +1,15 @@
+# BUG 
+# absolute direction moves in increments of 10??
+# absolute_periphery has len == 2?? why?
+
 # TODO
 # make snake have sense of direction (move direction from game to snake)
-# have snake or Brain check front/left/right for food/wall
+# have snake output absolute matrix with directions instead of relative L,F,R
+# make snake direction customisable
 
 import random as rn
 import pygame
+import numpy as np
 
 class Snake():
     """
@@ -22,7 +28,8 @@ class Snake():
         else:
             x = rn.randint(world.width //2 - world.width//4, world.width //2 + world.width//4)
             y = rn.randint(world.height //2 - world.height//4, world.height //2 + world.height//4)
-        self.direction = None
+        
+        self.direction = (1,0)
         self.body = []
         for i in range(0,init_len):
             self.body.append((x-i, y))
@@ -59,6 +66,31 @@ class Snake():
         else:
             return self.alive
 
+    def see(self, food, worldwide=False):
+        """
+        will make the snake observe and returns a tuple with the direction of where the stimulus is
+        when lethal = True it will return two tuples with the second being the direction of the lethal objects
+        rotate direction eigenvector and if it collides with food or lethals return 1
+        """
+        head_pos = self.body[0]
+        angles = (np.pi/2, 0, -np.pi/2)
+        rotation_matrix = lambda phi: ((np.around(np.cos(phi), decimals=4), -np.sin(phi)),
+                                        (np.sin(phi), np.around(np.cos(phi), decimals=4))) 
+        rotation_2d = lambda phi, dxdy: np.dot(rotation_matrix(phi), np.transpose(dxdy))
+        # L,F,R directions relative to head direction
+        periphery_relative = [rotation_2d(phi, self.direction) for phi in angles]
+        # L,F,R directions absolute coordinates
+        periphery_absolute = list(tuple(map(sum, zip(periphery, head_pos))) for periphery in periphery_relative)
+        # L,F,R direction of food relative to head direction
+        food_dir = [1 if  dxdy == (food.x, food.y) else 0 for dxdy in periphery_absolute]
+        lethal_dir = [-1 if (dxdy in self.body) or # eat tail
+                        (dxdy[0] >= self.world.width) or (dxdy[1] >= self.world.height) or # out of bounds
+                        (dxdy[0] <= 0) or (dxdy[1]<= 0) # out of bounds
+                        else 0 
+                        for dxdy in periphery_absolute]
+        return np.array([*food_dir, *lethal_dir]).reshape(1,self.brain.network_shape[0])
+
+
     def draw(self):
         """
         Draw the body of the snake.
@@ -69,5 +101,12 @@ class Snake():
             rect = pygame.Rect(x, y, size, size)
             pygame.draw.rect(self.world.window, (250,250,250), rect)
  
-
-            
+# from World import World
+# from Brain import Brain
+# from Food import Food
+# werld = World(100,100)
+# fewd = Food(werld)
+# network_shape = [6,12,12,12,3]
+# bren = Brain(network_shape)
+# snek = Snake(werld, brain=bren)
+# vision = snek.see(fewd)
