@@ -4,6 +4,7 @@
 # make snake have sense of direction (move direction from game to snake)
 # have snake output absolute matrix with directions instead of relative L,F,R
 # make snake direction customisable
+# implement print method for better logging
 
 import random as rn
 import pygame
@@ -73,13 +74,19 @@ class Snake():
         """
         will make the snake observe and returns a tuple with the direction of where the stimulus is
         when lethal = True it will return two tuples with the second being the direction of the lethal objects
-        rotate direction eigenvector and if it collides with food or lethals return 1
+        rotate direction eigenvector and if it collides with food return 1 for lethals return -1
+        if worldwide vision then will return a flattened matrix of x,y coordinates each with len world.width, world.height
         """
         head_pos = self.body[0]
+        if worldwide:
+            xs, ys = np.zeros((self.world.width, self.world.height))
+            xs[food.x], ys[food.y] = 1, 1
+            xs[head_pos[0]], ys[head_pos[1]] = -1, -1
+            return np.array([*xs, *ys]).reshape(1,self.brain.network_shape[0])
         # L,F,R directions relative to head direction
         self.periphery_relative = [Snake.rotation_2d(phi, self.direction) for phi in Snake.angles]
         # L,F,R directions absolute coordinates
-        periphery_absolute = list(tuple(map(sum, zip(periphery, head_pos))) for periphery in periphery_relative)
+        periphery_absolute = list(tuple(map(sum, zip(periphery, head_pos))) for periphery in self.periphery_relative)
         # L,F,R direction of food relative to head direction
         food_dir = [1 if  dxdy == (food.x, food.y) else 0 for dxdy in periphery_absolute]
         lethal_dir = [-1 if (dxdy in self.body) or # eat tail
